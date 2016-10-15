@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Pro React</title>
+	<style>
+		*{
+			box-sizing: border-box;
+		}
+		html,body,#app {
+			height:100%;
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			background: #eee;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		}
+		h1{
+			font-weight: 200;
+			color: #3b414c;
+			font-size: 20px;
+		}
+		ul {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+		.app {
+			white-space: nowrap ;
+			height:100%;
+		}
+		.list {
+			position: relative;
+			display: inline-block;
+			vertical-align: top;
+			white-space: normal;
+			height: 100%;
+			width: 33%;
+			padding: 0 20px;
+			overflow: none;
+		}
+		.list:not(:last-child):after{
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 1px;
+			height: 99%;
+			background: linear-gradient(to bottom, #eee 0%, #ccc 50%, #eee 100%) fixed;
+		}
+		.card {
+			position: relative;
+			z-index: 1;
+			background: #fff;
+			width: 100%;
+			padding: 10px 10px 10px 15px;
+			margin: 0 0 10px 0;
+			overflow: auto;
+			border: 1px solid #e5e5df;
+			border-radius: 3px;
+			box-shadow: 0 10px 6px -6px #777;
+		}
+		.card_title {
+			font-weight: bold;
+			border-bottom: solid 5px transparent;
+			cursor: pointer;
+		}
+		.card_title:before {
+			display: inline-block;
+			width: 1em;
+			content: '\025B8';
+			font-size: 20px;
+		}
+		.card_title--is-open:before {
+			content: '\025BE';
+		}
+		.checklist_task:first-child {
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: dashed 1px #ddd;
+		}
+		.checklist_task--remove:after{
+			font-weight: bolder;
+			display: inline-block;
+			color: #d66;
+			content: "\a0\000D7";
+		}
+		.checklist--add-task{
+			border: 1px dashed #bbb;
+			width: 100%;
+			padding: 10px;
+			margin-top: 5px;
+			border-radius: 3px;
+		}
+	</style>
+</head>
+<body>
+	<div id="app"></div>
+</body>
+</html>
