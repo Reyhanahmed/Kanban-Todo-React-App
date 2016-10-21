@@ -54,42 +54,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _KanbanBoard = __webpack_require__(172);
+	var _KanbanBoardContainer = __webpack_require__(172);
 
-	var _KanbanBoard2 = _interopRequireDefault(_KanbanBoard);
+	var _KanbanBoardContainer2 = _interopRequireDefault(_KanbanBoardContainer);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var cardsList = [{
-		id: 1,
-		title: 'Read the Book',
-		description: 'I should read the **whole** book',
-		color: '#BD8D31',
-		status: 'in-progress',
-		tasks: []
-	}, {
-		id: 2,
-		title: 'Write some code',
-		description: 'Code along with the sample in the book. \
-				The complete source can be found at [github](https://github.com/pro-react)',
-		color: '#3A7E28',
-		status: 'todo',
-		tasks: [{
-			id: 1,
-			name: 'ContactList Example',
-			done: true
-		}, {
-			id: 2,
-			name: 'Kanban Example',
-			done: false
-		}, {
-			id: 3,
-			name: 'My own exeriments',
-			done: false
-		}]
-	}];
-
-	_reactDom2.default.render(_react2.default.createElement(_KanbanBoard2.default, { cards: cardsList }), document.getElementById('app'));
+	_reactDom2.default.render(_react2.default.createElement(_KanbanBoardContainer2.default, null), document.getElementById('app'));
 
 /***/ },
 /* 1 */
@@ -21474,7 +21445,184 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _List = __webpack_require__(173);
+	var _KanbanBoard = __webpack_require__(173);
+
+	var _KanbanBoard2 = _interopRequireDefault(_KanbanBoard);
+
+	var _reactAddonsUpdate = __webpack_require__(178);
+
+	var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var API_URL = 'http://kanbanapi.pro-react.com';
+	var API_HEADERS = {
+		'Content-Type': 'application/json',
+		Authorization: 'Rehan'
+	};
+
+	var KanbanBoardContainer = function (_Component) {
+		_inherits(KanbanBoardContainer, _Component);
+
+		function KanbanBoardContainer(props) {
+			_classCallCheck(this, KanbanBoardContainer);
+
+			var _this = _possibleConstructorReturn(this, (KanbanBoardContainer.__proto__ || Object.getPrototypeOf(KanbanBoardContainer)).call(this, props));
+
+			_this.state = {
+				cards: []
+			};
+			return _this;
+		}
+
+		_createClass(KanbanBoardContainer, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var _this2 = this;
+
+				fetch(API_URL + '/cards', { headers: API_HEADERS }).then(function (response) {
+					return response.json();
+				}).then(function (responseData) {
+					_this2.setState({ cards: responseData });
+					window.state = _this2.state;
+				}).catch(function (error) {
+					cosole.log('Error fetching and parsing data', error);
+				});
+			}
+		}, {
+			key: 'addTask',
+			value: function addTask(cardId, taskName) {
+				var _this3 = this;
+
+				var prevState = this.state;
+				var cardIndex = this.state.cards.findIndex(function (card) {
+					return card.id === cardId;
+				});
+				var newTask = { id: Date.now(), name: taskName, done: false };
+				var nextState = (0, _reactAddonsUpdate2.default)(this.state.cards, _defineProperty({}, cardIndex, {
+					tasks: { $push: [newTask] }
+				}));
+
+				this.setState({ cards: nextState });
+
+				fetch(API_URL + '/cards/' + cardId + '/tasks', {
+					method: 'post',
+					headers: API_HEADERS,
+					body: JSON.stringify(newTask)
+				}).then(function (response) {
+					if (respoonse.ok) {
+						return response.json();
+					} else {
+						throw new Error("Server response wasn't OK");
+					}
+				}).then(function (responseData) {
+					newTask.id = responseData.id;
+					_this3.setState({ cards: nextState });
+				}).catch(function (error) {
+					_this3.setState(prevState);
+				});
+			}
+		}, {
+			key: 'deleteTask',
+			value: function deleteTask(cardId, taskId, taskIndex) {
+				var _this4 = this;
+
+				var cardIndex = this.state.cards.findIndex(function (card) {
+					return card.id == cardId;
+				});
+				var prevState = this.state;
+				var nextState = (0, _reactAddonsUpdate2.default)(this.state.cards, _defineProperty({}, cardIndex, {
+					tasks: { $splice: [[taskIndex, 1]] }
+				}));
+				this.setState({ cards: nextState });
+
+				fetch(API_URL + '/cards/' + cardId + '/tasks/' + taskId, {
+					method: 'delete',
+					headers: API_HEADERS
+				}).then(function (response) {
+					if (!response.ok) {
+						throw new Error("Server wasn't OK");
+					}
+				}).catch(function (error) {
+					console.error("Fetch error:", error);
+					_this4.setState(prevState);
+				});
+			}
+		}, {
+			key: 'toggleTask',
+			value: function toggleTask(cardId, taskId, taskIndex) {
+				var _this5 = this;
+
+				var prevState = this.state;
+				var cardIndex = this.state.cards.findIndex(function (card) {
+					return card.id === cardId;
+				});
+				var newDoneValue = void 0;
+				var newState = (0, _reactAddonsUpdate2.default)(this.state.cards, _defineProperty({}, cardIndex, {
+					tasks: _defineProperty({}, taskIndex, {
+						done: { $apply: function $apply(done) {
+								newDoneValue = !done;
+								return newDoneValue;
+							} }
+					})
+				}));
+				this.setState({ cards: nextState });
+
+				fetch(API_URL + '/cards/' + cardId + '/tasks/' + taskId, {
+					method: 'put',
+					headers: API_HEADERS,
+					body: JSON.stringify({ done: newDoneValue })
+				}).then(function (response) {
+					if (!response.ok) {
+						throw new Error("Server response wasn't OK");
+					}
+				}).catch(function (error) {
+					console.error('Fetch error:', error);
+					_this5.setState(prevState);
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(_KanbanBoard2.default, { cards: this.state.cards,
+					taskCallbacks: {
+						toggle: this.toggleTask.bind(this),
+						delete: this.deleteTask.bind(this),
+						add: this.addTask.bind(this)
+					} });
+			}
+		}]);
+
+		return KanbanBoardContainer;
+	}(_react.Component);
+
+	exports.default = KanbanBoardContainer;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(166);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _List = __webpack_require__(174);
 
 	var _List2 = _interopRequireDefault(_List);
 
@@ -21501,13 +21649,13 @@
 				return _react2.default.createElement(
 					'div',
 					{ className: 'app' },
-					_react2.default.createElement(_List2.default, { id: 'todo', title: 'To Do', cards: this.props.cards.filter(function (card) {
+					_react2.default.createElement(_List2.default, { id: 'todo', taskCallbacks: this.props.taskCallbacks, title: 'To Do', cards: this.props.cards.filter(function (card) {
 							return card.status === 'todo';
 						}) }),
-					_react2.default.createElement(_List2.default, { id: 'in-progress', title: 'In Progress', cards: this.props.cards.filter(function (card) {
+					_react2.default.createElement(_List2.default, { id: 'in-progress', taskCallbacks: this.props.taskCallbacks, title: 'In Progress', cards: this.props.cards.filter(function (card) {
 							return card.status === 'in-progress';
 						}) }),
-					_react2.default.createElement(_List2.default, { id: 'done', title: 'Done', cards: this.props.cards.filter(function (card) {
+					_react2.default.createElement(_List2.default, { id: 'done', taskCallbacks: this.props.taskCallbacks, title: 'Done', cards: this.props.cards.filter(function (card) {
 							return card.status === 'done';
 						}) })
 				);
@@ -21518,13 +21666,14 @@
 	}(_react.Component);
 
 	KanbanBoard.propTypes = {
-		cards: _react.PropTypes.arrayOf(_react.PropTypes.object)
+		cards: _react.PropTypes.arrayOf(_react.PropTypes.object),
+		taskCallbacks: _react.PropTypes.object
 	};
 
 	exports.default = KanbanBoard;
 
 /***/ },
-/* 173 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21539,7 +21688,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Card = __webpack_require__(174);
+	var _Card = __webpack_require__(175);
 
 	var _Card2 = _interopRequireDefault(_Card);
 
@@ -21563,9 +21712,12 @@
 		_createClass(List, [{
 			key: 'render',
 			value: function render() {
+				var _this2 = this;
+
 				var cards = this.props.cards.map(function (card, idx) {
 					return _react2.default.createElement(_Card2.default, { id: card.id,
 						key: idx,
+						taskCallbacks: _this2.props.taskCallbacks,
 						title: card.title,
 						description: card.description,
 						color: card.color,
@@ -21590,13 +21742,14 @@
 
 	List.propTypes = {
 		title: _react.PropTypes.string.isRequired,
-		cards: _react.PropTypes.arrayOf(_react.PropTypes.object)
+		cards: _react.PropTypes.arrayOf(_react.PropTypes.object),
+		taskCallbacks: _react.PropTypes.object
 	};
 
 	exports.default = List;
 
 /***/ },
-/* 174 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21611,11 +21764,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _CheckList = __webpack_require__(175);
+	var _CheckList = __webpack_require__(176);
 
 	var _CheckList2 = _interopRequireDefault(_CheckList);
 
-	var _marked = __webpack_require__(176);
+	var _marked = __webpack_require__(177);
 
 	var _marked2 = _interopRequireDefault(_marked);
 
@@ -21664,7 +21817,7 @@
 						'div',
 						{ className: 'card_details' },
 						_react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: (0, _marked2.default)(this.props.description) } }),
-						_react2.default.createElement(_CheckList2.default, { cardId: this.props.id, tasks: this.props.tasks })
+						_react2.default.createElement(_CheckList2.default, { cardId: this.props.id, taskCallbacks: this.props.taskCallbacks, tasks: this.props.tasks })
 					);
 				}
 				var sideColor = {
@@ -21700,13 +21853,14 @@
 		title: titlePropType,
 		description: _react.PropTypes.string,
 		color: _react.PropTypes.string,
-		tasks: _react.PropTypes.arrayOf(_react.PropTypes.object)
+		tasks: _react.PropTypes.arrayOf(_react.PropTypes.object),
+		taskCallbacks: _react.PropTypes.object
 	};
 
 	exports.default = Card;
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21739,15 +21893,26 @@
 		}
 
 		_createClass(CheckList, [{
+			key: 'checkInputKeyPress',
+			value: function checkInputKeyPress(evt) {
+				if (evt.key === 'Enter') {
+					this.props.taskCallbacks.add(this.props.cardId, evt.target.value);
+					evt.target.value = "";
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
+				var _this2 = this;
+
 				var tasks = this.props.tasks.map(function (task, idx) {
 					return _react2.default.createElement(
 						'li',
 						{ className: 'checklist_task', key: idx },
-						_react2.default.createElement('input', { type: 'checkbox', defaultChecked: task.done }),
+						_react2.default.createElement('input', { type: 'checkbox', defaultChecked: task.done, onChange: _this2.props.taskCallbacks.toggle.bind(null, _this2.props.cardId, task.id, idx) }),
 						task.name,
-						_react2.default.createElement('a', { href: '#', className: 'checklist_task--remove' })
+						' ',
+						_react2.default.createElement('a', { href: '#', className: 'checklist_task--remove', onClick: _this2.props.taskCallbacks.delete.bind(null, _this2.props.cardId, task.id, idx) })
 					);
 				});
 
@@ -21761,7 +21926,8 @@
 					),
 					_react2.default.createElement('input', { type: 'text',
 						className: 'checklist--add-task',
-						placeholder: 'Type then hit Enter to add task' })
+						placeholder: 'Type then hit Enter to add task',
+						onKeyPress: this.checkInputKeyPress.bind(this) })
 				);
 			}
 		}]);
@@ -21777,7 +21943,7 @@
 	exports.default = CheckList;
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -23068,6 +23234,131 @@
 	}());
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(179);
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-present, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule update
+	 */
+
+	/* global hasOwnProperty:true */
+
+	'use strict';
+
+	var _prodInvariant = __webpack_require__(5),
+	    _assign = __webpack_require__(24);
+
+	var keyOf = __webpack_require__(30);
+	var invariant = __webpack_require__(7);
+	var hasOwnProperty = {}.hasOwnProperty;
+
+	function shallowCopy(x) {
+	  if (Array.isArray(x)) {
+	    return x.concat();
+	  } else if (x && typeof x === 'object') {
+	    return _assign(new x.constructor(), x);
+	  } else {
+	    return x;
+	  }
+	}
+
+	var COMMAND_PUSH = keyOf({ $push: null });
+	var COMMAND_UNSHIFT = keyOf({ $unshift: null });
+	var COMMAND_SPLICE = keyOf({ $splice: null });
+	var COMMAND_SET = keyOf({ $set: null });
+	var COMMAND_MERGE = keyOf({ $merge: null });
+	var COMMAND_APPLY = keyOf({ $apply: null });
+
+	var ALL_COMMANDS_LIST = [COMMAND_PUSH, COMMAND_UNSHIFT, COMMAND_SPLICE, COMMAND_SET, COMMAND_MERGE, COMMAND_APPLY];
+
+	var ALL_COMMANDS_SET = {};
+
+	ALL_COMMANDS_LIST.forEach(function (command) {
+	  ALL_COMMANDS_SET[command] = true;
+	});
+
+	function invariantArrayCase(value, spec, command) {
+	  !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected target of %s to be an array; got %s.', command, value) : _prodInvariant('1', command, value) : void 0;
+	  var specValue = spec[command];
+	  !Array.isArray(specValue) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array; got %s. Did you forget to wrap your parameter in an array?', command, specValue) : _prodInvariant('2', command, specValue) : void 0;
+	}
+
+	/**
+	 * Returns a updated shallow copy of an object without mutating the original.
+	 * See https://facebook.github.io/react/docs/update.html for details.
+	 */
+	function update(value, spec) {
+	  !(typeof spec === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): You provided a key path to update() that did not contain one of %s. Did you forget to include {%s: ...}?', ALL_COMMANDS_LIST.join(', '), COMMAND_SET) : _prodInvariant('3', ALL_COMMANDS_LIST.join(', '), COMMAND_SET) : void 0;
+
+	  if (hasOwnProperty.call(spec, COMMAND_SET)) {
+	    !(Object.keys(spec).length === 1) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Cannot have more than one key in an object with %s', COMMAND_SET) : _prodInvariant('4', COMMAND_SET) : void 0;
+
+	    return spec[COMMAND_SET];
+	  }
+
+	  var nextValue = shallowCopy(value);
+
+	  if (hasOwnProperty.call(spec, COMMAND_MERGE)) {
+	    var mergeObj = spec[COMMAND_MERGE];
+	    !(mergeObj && typeof mergeObj === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a spec of type \'object\'; got %s', COMMAND_MERGE, mergeObj) : _prodInvariant('5', COMMAND_MERGE, mergeObj) : void 0;
+	    !(nextValue && typeof nextValue === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a target of type \'object\'; got %s', COMMAND_MERGE, nextValue) : _prodInvariant('6', COMMAND_MERGE, nextValue) : void 0;
+	    _assign(nextValue, spec[COMMAND_MERGE]);
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_PUSH)) {
+	    invariantArrayCase(value, spec, COMMAND_PUSH);
+	    spec[COMMAND_PUSH].forEach(function (item) {
+	      nextValue.push(item);
+	    });
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_UNSHIFT)) {
+	    invariantArrayCase(value, spec, COMMAND_UNSHIFT);
+	    spec[COMMAND_UNSHIFT].forEach(function (item) {
+	      nextValue.unshift(item);
+	    });
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_SPLICE)) {
+	    !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Expected %s target to be an array; got %s', COMMAND_SPLICE, value) : _prodInvariant('7', COMMAND_SPLICE, value) : void 0;
+	    !Array.isArray(spec[COMMAND_SPLICE]) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : _prodInvariant('8', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : void 0;
+	    spec[COMMAND_SPLICE].forEach(function (args) {
+	      !Array.isArray(args) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : _prodInvariant('8', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : void 0;
+	      nextValue.splice.apply(nextValue, args);
+	    });
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_APPLY)) {
+	    !(typeof spec[COMMAND_APPLY] === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be a function; got %s.', COMMAND_APPLY, spec[COMMAND_APPLY]) : _prodInvariant('9', COMMAND_APPLY, spec[COMMAND_APPLY]) : void 0;
+	    nextValue = spec[COMMAND_APPLY](nextValue);
+	  }
+
+	  for (var k in spec) {
+	    if (!(ALL_COMMANDS_SET.hasOwnProperty(k) && ALL_COMMANDS_SET[k])) {
+	      nextValue[k] = update(value[k], spec[k]);
+	    }
+	  }
+
+	  return nextValue;
+	}
+
+	module.exports = update;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }
 /******/ ]);
