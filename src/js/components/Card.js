@@ -1,6 +1,9 @@
 import React, {Component, PropTypes} from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import CheckList from './CheckList';
 import marked from 'marked';
+import {DragSource, DropTarget} from 'react-dnd';
+import constants from '../constants/constants';
 
 let titlePropType = (props, propName, componentName) => {
 	if(props[propName]){
@@ -8,6 +11,37 @@ let titlePropType = (props, propName, componentName) => {
 		if (typeof value !== 'string' || value.length > 80) {
 			return new Error(`${propName} in ${componentName} is longer than 80 characters.`);
 		}
+	}
+}
+
+const cardDragSpec = {
+	beginDrag(props){
+		return{
+			id: props.id,
+			status: props.status
+		}
+	},
+	endDrag(props){
+		props.cardCallbacks.persistCardDrag(props.id, props.status);
+	}
+}
+
+const cardDropSpec = {
+	hover(props, monitor){
+		const draggedId = monitor.getItem().id;
+		props.cardCallbacks.updatePosition(draggedId, props.id);
+	}
+}
+
+let collectDrag = (connect, monitor) => {
+	return {
+		connectDragSource: connect.dragSource()
+	};
+}
+
+let collectDrop = (connect, monitor) => {
+	return {
+		connectDropTarget: connect.dropTarget()
 	}
 }
 
@@ -23,6 +57,7 @@ class Card extends Component{
 		this.setState({showDetails: !this.state.showDetails});
 	}
 	render(){
+		const {connectDragSource, connectDropTarget} = this.props;
 		let cardDetails;
 		if (this.state.showDetails) {
 			cardDetails = (
@@ -41,7 +76,7 @@ class Card extends Component{
 			width: 7,
 			backgroundColor: this.props.color
 		};
-		return(
+		return connectDropTarget(connectDragSource(
 			<div className="card">
 				<div style={sideColor}/>
 				<div className={this.state.showDetails ? 'card_title card_title--is-open' : 'card_title'} 
@@ -49,9 +84,13 @@ class Card extends Component{
 				>
 					{this.props.title}
 				</div>
-				{cardDetails}
+				<ReactCSSTransitionGroup transitionName="toggle"
+										 transitionEnterTimeout={250}
+										 transitionLeaveTimeout={250}>
+					{cardDetails}
+				</ReactCSSTransitionGroup>
 			</div>
-		);
+		));
 	}
 }
 
@@ -61,7 +100,12 @@ Card.propTypes = {
 	description: PropTypes.string,
 	color: PropTypes.string,
 	tasks: PropTypes.arrayOf(PropTypes.object),
-	taskCallbacks: PropTypes.object
+	taskCallbacks: PropTypes.object,
+	cardCallbacks: PropTypes.object,
+	connectDragSource: PropTypes.func.isRequired,
+	connectDropTarget: PropTypes.func.isRequired
 }
 
-export default Card;
+const dragHighOrderCard = DragSource(constants.CARD, cardDragSpec, collectDrag)(Card);
+const dragDropHighOrderCard = DropTarget(constants.CARD, cardDropSpec, collectDrop)(dragHighOrderCard);
+export default dragDropHighOrderCard;
