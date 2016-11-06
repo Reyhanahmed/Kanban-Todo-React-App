@@ -30420,7 +30420,7 @@
 					_this2.setState({ cards: responseData });
 					window.state = _this2.state;
 				}).catch(function (error) {
-					cosole.log('Error fetching and parsing data', error);
+					console.log('Error fetching and parsing data', error);
 				});
 			}
 		}, {
@@ -30706,6 +30706,10 @@
 		_createClass(KanbanBoard, [{
 			key: 'render',
 			value: function render() {
+				var cardModal = this.props.children && _react2.default.cloneElement(this.props.children, {
+					cards: this.props.cards,
+					cardCallbacks: this.props.cardCallbacks
+				});
 				return _react2.default.createElement(
 					'div',
 					{ className: 'app' },
@@ -30723,7 +30727,8 @@
 						cardCallbacks: this.props.cardCallbacks,
 						cards: this.props.cards.filter(function (card) {
 							return card.status === 'done';
-						}) })
+						}) }),
+					cardModal
 				);
 			}
 		}]);

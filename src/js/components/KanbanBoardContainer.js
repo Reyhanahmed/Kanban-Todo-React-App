@@ -27,7 +27,7 @@ class KanbanBoardContainer extends Component{
 			window.state = this.state;
 		})
 		.catch((error) => {
-			cosole.log('Error fetching and parsing data', error);
+			console.log('Error fetching and parsing data', error);
 		});
 	}
 
