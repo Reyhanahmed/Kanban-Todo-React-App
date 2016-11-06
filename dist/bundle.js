@@ -30576,19 +30576,82 @@
 				});
 			}
 		}, {
+			key: 'addCard',
+			value: function addCard(card) {
+				var _this7 = this;
+
+				var prevState = this.state;
+				if (card.id === null) {
+					var _card = Object.assign({}, _card, { id: Date.now() });
+				}
+
+				var nextState = (0, _reactAddonsUpdate2.default)(this.state.cards, { $push: [card] });
+				this.setState({ cards: nextState });
+
+				fetch(API_URL + '/cards', {
+					method: 'post',
+					headers: API_HEADERS,
+					body: JSON.stringify(card)
+				}).then(function (response) {
+					if (response.ok) {
+						return response.json();
+					} else {
+						throw new Error('Server response was not OK');
+					}
+				}).then(function (responseData) {
+					card.id = responseData.id;
+					_this7.setState({ cards: nextState });
+				}).catch(function (error) {
+					_this7.setState(prevState);
+				});
+			}
+		}, {
+			key: 'updateCard',
+			value: function updateCard(card) {
+				var _this8 = this;
+
+				var prevState = this.state;
+
+				var cardIndex = this.state.cards.findIndex(function (c) {
+					return c.id === card.id;
+				});
+
+				var nextState = (0, _reactAddonsUpdate2.default)(this.state.cards, _defineProperty({}, cardIndex, { $set: card }));
+
+				this.setState({ cards: nextState });
+
+				fetch(API_URL + '/cards/' + card.id, {
+					method: 'put',
+					headers: API_HEADERS,
+					body: JSON.stringify(card)
+				}).then(function (response) {
+					if (!response.ok) {
+						throw new Error("Server response wasn't OK");
+					}
+				}).catch(function (error) {
+					console.error('Fetch error:', error);
+					_this8.setState(prevState);
+				});
+			}
+		}, {
 			key: 'render',
 			value: function render() {
-				return _react2.default.createElement(_KanbanBoard2.default, { cards: this.state.cards,
+				var kanbanBoard = this.props.children && _react2.default.cloneElement(this.props.children, {
+					cards: this.state.cards,
 					taskCallbacks: {
 						toggle: this.toggleTask.bind(this),
 						delete: this.deleteTask.bind(this),
 						add: this.addTask.bind(this)
 					},
 					cardCallbacks: {
+						addCard: this.addCard.bind(this),
+						updateCard: this.updateCard.bind(this),
 						updateStatus: this.updateCardStatus.bind(this),
 						updatePosition: this.updateCardPosition.bind(this),
 						persistCardDrag: this.persistCardDrag.bind(this)
-					} });
+					}
+				});
+				return kanbanBoard;
 			}
 		}]);
 
