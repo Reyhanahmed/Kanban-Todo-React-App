@@ -20,11 +20,13 @@ class CardForm extends Component{
 								required={true}
 								autoFocus={true}
 						/>
+						<br/>
 						<textarea value={this.props.draftCard.description}
 								  onChange={this.handleChange.bind(this, 'description')}
 								  placeholder='Description'
 								  required={true}
 						/>
+						<br/>
 						<label htmlFor="status">Status</label>
 						<select id="status"
 								value={this.props.draftCard.status}
@@ -42,7 +44,7 @@ class CardForm extends Component{
 						/>
 
 						<div className='actions'>
-							<button type="submit">{this.props.buttonLable}</button>
+							<button type="submit">{this.props.buttonLabel}</button>
 						</div>
 					</form>
 				</div>

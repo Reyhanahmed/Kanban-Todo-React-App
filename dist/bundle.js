@@ -39128,6 +39128,8 @@
 
 	var _constants2 = _interopRequireDefault(_constants);
 
+	var _reactRouter = __webpack_require__(172);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -39224,6 +39226,15 @@
 					'div',
 					{ className: 'card' },
 					_react2.default.createElement('div', { style: sideColor }),
+					_react2.default.createElement(
+						'div',
+						{ className: 'card_edit' },
+						_react2.default.createElement(
+							_reactRouter.Link,
+							{ to: '/edit/' + this.props.id },
+							'\u270E'
+						)
+					),
 					_react2.default.createElement(
 						'div',
 						{ className: this.state.showDetails ? 'card_title card_title--is-open' : 'card_title',
@@ -41670,6 +41681,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _CardForm = __webpack_require__(443);
+
+	var _CardForm2 = _interopRequireDefault(_CardForm);
+
 	var _reactRouter = __webpack_require__(172);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41721,7 +41736,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				return _react2.default.createElement(CardForm, { draftCard: this.state,
+				return _react2.default.createElement(_CardForm2.default, { draftCard: this.state,
 					buttonLabel: 'Edit Card',
 					handleChange: this.handleChange.bind(this),
 					handleSubmit: this.handleSubmit.bind(this),
@@ -41892,11 +41907,13 @@
 								required: true,
 								autoFocus: true
 							}),
+							_react2.default.createElement("br", null),
 							_react2.default.createElement("textarea", { value: this.props.draftCard.description,
 								onChange: this.handleChange.bind(this, 'description'),
 								placeholder: "Description",
 								required: true
 							}),
+							_react2.default.createElement("br", null),
 							_react2.default.createElement(
 								"label",
 								{ htmlFor: "status" },
@@ -41940,7 +41957,7 @@
 								_react2.default.createElement(
 									"button",
 									{ type: "submit" },
-									this.props.buttonLable
+									this.props.buttonLabel
 								)
 							)
 						)

@@ -127,6 +127,7 @@
 			padding: 15px;
 			top: 0; left: 0; bottom: 100px; right: 0;
 			z-index: 3;
+			overflow-y: hidden;
 		}
 		.card.big input[type=text], textarea{
 			width: 100%;
@@ -156,6 +157,7 @@
 		.card.big button{
 			font-size: 14px;
 			padding: 8px;
+			float: right;
 		}
 		.float-button{
 			position: absolute;
@@ -172,6 +174,21 @@
 			text-decoration: none;
 			line-height: 50px;
 			box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+		}
+		.card_edit{
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			opacity: 0;
+			transition: opacity .25s ease-in;
+		}
+		.card:hover .card_edit{
+			opacity: 1;
+		}
+		.card_edit a{
+			text-decoration: none;
+			color: #999;
+			font-size: 17px;
 		}
 	</style>
 </head>
