@@ -39,7 +39,6 @@ class CardForm extends Component{
 							   id='color'
 							   value={this.props.draftCard.color}
 							   onChange={this.handleChange.bind(this, 'color')}
-							   defaultValue='#ff0000'
 						/>
 
 						<div className='actions'>

@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {hashHistory} from 'react-router';
 
 class EditCard extends Component{
 
@@ -14,11 +15,11 @@ class EditCard extends Component{
 	handleSubmit(e){
 		e.preventDefault();
 		this.props.cardCallbacks.updateCard(this.state);
-		this.props.history.push('/');
+		hashHistory.push('/');
 	}
 
 	handleClose(e){
-		this.props.history.push('/');
+		hashHistory.push('/');
 	}
 
 	render(){

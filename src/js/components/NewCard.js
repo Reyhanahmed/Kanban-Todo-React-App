@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import CardForm from './CardForm';
+import {hashHistory} from 'react-router';
 
 class NewCard extends Component{
 	componentWillMount(){
@@ -20,11 +21,11 @@ class NewCard extends Component{
 	handleSubmit(e){
 		e.preventDefault();
 		this.props.cardCallbacks.addCard(this.state);
-		this.props.history.push('/');
+		hashHistory.push('/');
 	}
 
 	handleClose(e){
-		this.props.history.push('/');
+		hashHistory.push('/');
 	}
 
 	render(){

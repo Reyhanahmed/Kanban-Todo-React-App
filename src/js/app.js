@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import {Router, Route, hashHistory} from 'react-router';
+// import createBrowserHistory from 'history/lib/createBrowserHistory';
 import KanbanBoardContainer from './components/KanbanBoardContainer';
 import KanbanBoard from './components/KanbanBoard';
 import EditCard from './components/EditCard';

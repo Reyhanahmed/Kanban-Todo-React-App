@@ -74,6 +74,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	// import createBrowserHistory from 'history/lib/createBrowserHistory';
 	_reactDom2.default.render(_react2.default.createElement(
 		_reactRouter.Router,
 		{ history: _reactRouter.hashHistory },
@@ -30682,6 +30683,8 @@
 
 	var _reactDndHtml5Backend2 = _interopRequireDefault(_reactDndHtml5Backend);
 
+	var _reactRouter = __webpack_require__(172);
+
 	var _List = __webpack_require__(426);
 
 	var _List2 = _interopRequireDefault(_List);
@@ -30713,6 +30716,11 @@
 				return _react2.default.createElement(
 					'div',
 					{ className: 'app' },
+					_react2.default.createElement(
+						_reactRouter.Link,
+						{ to: '/new', className: 'float-button' },
+						'+'
+					),
 					_react2.default.createElement(_List2.default, { id: 'todo', taskCallbacks: this.props.taskCallbacks, title: 'To Do',
 						cardCallbacks: this.props.cardCallbacks,
 						cards: this.props.cards.filter(function (card) {
@@ -41662,6 +41670,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(172);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -41701,12 +41711,12 @@
 			value: function handleSubmit(e) {
 				e.preventDefault();
 				this.props.cardCallbacks.updateCard(this.state);
-				this.props.history.push('/');
+				_reactRouter.hashHistory.push('/');
 			}
 		}, {
 			key: 'handleClose',
 			value: function handleClose(e) {
-				this.props.history.push('/');
+				_reactRouter.hashHistory.push('/');
 			}
 		}, {
 			key: 'render',
@@ -41749,6 +41759,8 @@
 
 	var _CardForm2 = _interopRequireDefault(_CardForm);
 
+	var _reactRouter = __webpack_require__(172);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -41790,12 +41802,12 @@
 			value: function handleSubmit(e) {
 				e.preventDefault();
 				this.props.cardCallbacks.addCard(this.state);
-				this.props.history.push('/');
+				_reactRouter.hashHistory.push('/');
 			}
 		}, {
 			key: 'handleClose',
 			value: function handleClose(e) {
-				this.props.history.push('/');
+				_reactRouter.hashHistory.push('/');
 			}
 		}, {
 			key: 'render',
@@ -41920,8 +41932,7 @@
 							_react2.default.createElement("input", { type: "color",
 								id: "color",
 								value: this.props.draftCard.color,
-								onChange: this.handleChange.bind(this, 'color'),
-								defaultValue: "#ff0000"
+								onChange: this.handleChange.bind(this, 'color')
 							}),
 							_react2.default.createElement(
 								"div",
