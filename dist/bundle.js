@@ -41903,6 +41903,7 @@
 							{ onSubmit: this.props.handleSubmit.bind(this) },
 							_react2.default.createElement("input", { type: "text",
 								value: this.props.draftCard.title,
+								onChange: this.handleChange.bind(this, 'title'),
 								placeholder: "Title",
 								required: true,
 								autoFocus: true
